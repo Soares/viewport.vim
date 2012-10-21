@@ -1,0 +1,159 @@
+*viewport.txt* Sweeping views for vim.
+					*viewport* *Viewport*
+
+Author:  Nate Soares <http://so8r.es/>
+License: Same terms as Vim itself (see |license|)
+
+=============================================================================
+CONTENTS					*viewport-contents*
+	    1. Introduction..............................|viewport-intro|
+	    2. Configuration.............................|viewport-config|
+	    3. Commands..................................|viewport-commands|
+	    4. Status line...............................|viewport-statusline|
+	    5. Mappings..................................|viewport-mappings|
+	    6. Extras....................................|viewport-extras|
+	    7. About.....................................|viewport-about|
+
+=============================================================================
+INTRODUCTION					*viewport-intro*
+
+Viewport makes your views better. It helps you:
+
+* Turn on automatic views
+* Prevent certain file types (tmp files, diff output, etc.) from having views
+* Clear bad view files and bad view settings
+
+=============================================================================
+CONFIGURATION					*viewport-config*
+
+					*g:viewport_loaded*
+Use this to disable the plugin entirely: >
+	let g:viewport_loaded = 1
+<
+
+					*g:viewport_filetypes*
+This setting allows you to control automatic view creation by filetype. It's
+a very versatile setting. It can be any of:
+	0: Disable completely.
+	1: Enable for all filetypes (default)
+	A whitelist: Enable for only the filetypes in this list.
+	A blackdict: Enable unless the filetype is in the dict with a 0 value.
+
+					*g:viewport_forbidden_files*
+A list of regexes. Files which match the regex will not have views created.
+The file will be fully expanded before the regex is used. Default: >
+	['^/dev/null$', '^/tmp']
+<
+					*g:viewport_forbidden_settings*
+A list of settings which, if set, signal that views should not be made.
+Default: >
+	['diff']
+<
+
+					*g:viewport_forbidden_vars*
+A list of variable names (given as strings), which, if existing and set,
+signal that views should not be made. Default: >
+	['b:viewport_disable']
+<
+This allows you to set 'b:viewport_disable' in a file to locally disable
+viewport.
+
+					*g:viewport_automap*
+Whether to make the default keybindings. See |viewport-mappings|.
+
+=============================================================================
+COMMANDS					*viewport-commands*
+
+:ViewportClear[!] [settings]			*:ViewportClear*
+	Clears views.
+
+	If used without [!] or [settings], it removes the view for the current
+	file.  If used with [!] and without [settings], it removes all view
+	files.  If used without [!] and with [settings], each setting in
+	[settings] is removed from the view file. The full name of the setting
+	must be given, i.e. 'tabstop' instead of 'ts'.  If used with [!] and
+	with [settings], each setting in [settings] is removed from all view
+	files. This is very useful if you change your workflow and want to
+	remove settings from all view files, e.g. > :ViewportClear! autochdir
+	< will clear the 'autochdir' from all views, letting them default to
+	the global setting.
+
+	:ViewportClear only clears default (unnumbered) views. It assumes that
+	if you've made numbered views that those are for special purpose and
+	does not remove them.
+
+	TODO: Detect numbers in [settings] and remove numbered views.
+
+=============================================================================
+STATUSLINE                                      *viewport-statusline*
+
+viewport#statusline([{level}])			*viewport#statusline*
+	Creates a statusline flag.
+
+	Takes an optional {level} function, which should be one of the |hume|
+	statusbar levels (ALL, MESSAGE, INFO, WARNING, ERROR). Displays
+	a statusline flag depending upon the mode.
+
+	MESSAGE:
+	'[view]' if the file has the default view.
+	'[view X]' where X is the views available, numbered 1-9 with
+		'*' meaning the default view.
+
+	INFO:
+	'[no view]' if the file has no view.
+
+	We suggest something like the following in your statusline: >
+		set statusline+=%#ModeMsg#
+		set statusline+=%{viewport#statusline(g:hume#0#MESSAGE)}
+		set statusline+=%#WarningMsg#
+		set statusline+=%{viewport#statusline(g:hume#0#INFO)}
+		set statusline+=%*
+	<
+	You are encouraged to customize this to your own needs. See
+	|viewport#views()| for help with customization.
+
+=============================================================================
+MAPPINGS					*viewport-mappings*
+
+Viewport does not set any mappings by default. We suggest something like the
+following to your vimrc: >
+	" Delete this file's view
+	noremap <leader>vx :ViewportClear
+	" Delete all file's views
+	noremap <leader>vd :ViewportClear!
+	" Unset a setting globally.
+	noremap <leader>vu :ViewportClear! ¬
+	" Unset a setting in Only this view
+	noremap <leader>vo :ViewportClear ¬
+<
+Notice the '¬' marker. That should not be in your mappings, but rather shows
+that you should have trailing whitespace in the line.
+
+Notice also that none of these mappings end with <CR>. This helps prevent the
+accidental deletion of view files, as you'll have to type the key binding and
+then press enter. If you don't want this safeguard, add <CR> to the end of the
+first two mappings.
+
+If you like these mappings, set 'g:viewport_autoload'. You're encouraged to
+customize these to your needs.
+
+=============================================================================
+EXTRAS                                          *viewport-extras*
+
+						*viewport#views()*
+This function returns the numbers of all view files that exist for the current
+file, with '0' meaning the default view and 1-9 meaning views 1-9.
+
+It's useful if you want to roll your own vim status lien.
+
+=============================================================================
+ABOUT                                           *viewport-about*
+
+Fair warning: Viewport is a bit hackish. It depends upon perl and upon vim's
+viewfile format, subject to change at any time. Your mileage may vary.
+
+Grab the latest version or report a bug on GitHub:
+
+http://github.com/Soares/viewport.vim
+
+ vim:ft=help:sw=8:ts=8:sts=8:noet:norl:

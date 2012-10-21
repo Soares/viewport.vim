@@ -1,10 +1,11 @@
 if exists('g:viewport_loaded')
 	finish
 endif
-let g:viewport_loaded = 1
+let g:loaded_viewport = 1
 
 
 " g:viewport_forbidden_files: A list of regexes which forbid certain files.
+" g:viewport_forbidden_settings: A list of settings which prevent view creation.
 " g:viewport_forbidden_vars: A list of vars which, if existing, signal a mode
 "		wherein views should not be created.
 " g:viewport_filetypes: Enable/disable viewport by filetype.
@@ -15,27 +16,29 @@ let g:viewport_loaded = 1
 " g:viewport_autoview: Whether to automatically make views.
 " g:viewport_automap: Whether to make the default keybindings
 call hume#0#def('viewport', {
+		\ 'filetypes': 1,
 		\ 'forbidden_files': ['^/dev/null$', '^/tmp'],
 		\ 'forbidden_settings': ['diff'],
-		\ 'forbidden_vars': [],
-		\ 'filetypes': 1,
-		\ 'autoview': 1,
+		\ 'forbidden_vars': ['b:viewport_disable'],
 		\ 'automap': 0,
 		\ })
 
 
 " The main Viewport command
-command! -bang -nargs=* ViewportClear call viewport#clear('!' == '<bang>', <q-args>)
+command! -bang -nargs=* ViewportClear
+		\ call viewport#clear('!' == '<bang>', <f-args>)
 
 
-if g:viewport_autoview
+if type(g:viewport_filetypes) != type(0) || g:viewport_filetypes
 	augroup viewport
 		autocmd!
 		" Autosave & Load Views.
 		autocmd BufWritePost,BufLeave,WinLeave ?* if viewport#shouldmake()
 				\| 	mkview
 				\| endif
-		autocmd BufWinEnter ?* if viewport#shouldmake() | silent loadview | endif
+		autocmd BufWinEnter ?* if viewport#shouldmake()
+				\| 	silent loadview
+				\| endif
 	augroup end
 endif
 

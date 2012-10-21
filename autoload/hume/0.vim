@@ -1,3 +1,10 @@
+" Hume message labels
+let g:hume#0#ALL = 0
+let g:hume#0#MESSAGE = 1
+let g:hume#0#INFO    = 2
+let g:hume#0#WARNING = 3
+let g:hume#0#ERROR   = 4
+
 " Define all variables in a dict globally.
 " They will be namespaced under g:<prefix>_
 " @param {string} prefix The plugin prefix
