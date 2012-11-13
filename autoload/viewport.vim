@@ -24,7 +24,7 @@ function! viewport#files(numbers, ...)
 		let l:path = a:1
 	endif
 	if empty(a:numbers)
-		return glob(&viewdir.'/'.l:path.'=*', 0, 1)
+		return glob(&viewdir.'/'.l:path.'=?', 0, 1)
 	endif
 	let l:files = []
 	for l:num in a:numbers
