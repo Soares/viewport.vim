@@ -1,5 +1,5 @@
 function! viewport#status#flag()
-	let l:flag = viewport#status#message()
+	let l:flag = viewport#status#alert()
 	if empty(l:flag)
 		let l:flag = viewport#status#info()
 	endif
@@ -7,7 +7,7 @@ function! viewport#status#flag()
 endfunction
 
 
-function! viewport#status#info()
+function! viewport#status#alert()
 	let l:views = viewport#views()
 	if l:views == '0'
 		return '[view]'
@@ -17,10 +17,10 @@ function! viewport#status#info()
 		return '[view '.l:views.']'
 	endif
 	return ''
-endif
+endfunction
 
 
-function! viewport#status#message()
+function! viewport#status#info()
 	let l:views = viewport#views()
 	if empty(l:views)
 		return '[no view]'

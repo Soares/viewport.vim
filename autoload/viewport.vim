@@ -10,6 +10,25 @@ function! s:strlist(string)
 endfunction
 
 
+" Checks whether a setting allows a value.
+" Designed for settings that can be either global, whitelisted, or blacklisted.
+" @param {number|list|dict} setting The setting to check
+" @param {string?} value The value to check. Default &ft.
+" @return Depends upon the setting:
+"		If a number or string, the setting is returned and the value ignored
+"		If a list, returns whether or not the value is in the list
+"		If a dict, returns setting[value] (defaults to 1)
+function! s:check(setting, ...)
+	let l:value = a:0 > 0 ? a:1 : &ft
+	if type(a:setting) == type([])
+		return index(a:setting, l:value) >= 0
+	elseif type(a:setting) == type({})
+		return get(a:setting, l:value, 1)
+	endif
+	return a:setting
+endfunction
+
+
 " Finds the views for a file.
 " @param {list} numbers The numbers of view files to find, each 0-9.
 "		If empty, search for all numbers.
@@ -94,29 +113,6 @@ function! viewport#views()
 endfunction
 
 
-" Makes a statusline flag telling what views are available.
-" @param {hume#0#FLAG}
-function! viewport#statusline(...)
-	let l:flag = a:0 == 0 ? g:hume#0#ALL : a:1
-	let l:views = viewport#views()
-
-	if empty(l:views)
-		if l:flag == g:hume#0#ALL || l:flag == g:hume#0#INFO
-			return '[no view]'
-		endif
-	elseif l:flag == g:hume#0#ALL || l:flag == g:hume#0#MESSAGE
-		if l:views == '0'
-			return '[view]'
-		elseif l:views =~# '\v^0'
-			return '[view *'.l:views[1:].']'
-		else
-			return '[view '.l:views.']'
-		endif
-	endif
-	return ''
-endfunction
-
-
 " Whether or not a view should be made for this file.
 " @return {boolean}
 " 	* False for buftype 'nofile'
@@ -136,7 +132,7 @@ function! viewport#shouldmake()
 	for l:var in g:viewport_forbidden_vars
 		exe 'if exists("'.l:var.'") && '.l:var.' | return 0 | endif'
 	endfor
-	if !hume#0#check(g:viewport_filetypes)
+	if !s:check(g:viewport_filetypes)
 		return 0
 	endif
 	let l:file = glob(expand('%:p'))
