@@ -26,63 +26,58 @@ Viewport makes your views better. It helps you:
 =============================================================================
 CONFIGURATION					*viewport-config*
 
-					*g:viewport_loaded*
-Use this to disable the plugin entirely: >
-	let g:viewport_loaded = 1
-<
-
 					*g:viewport_filetypes*
 This setting allows you to control automatic view creation by filetype. It's
 a very versatile setting. It can be any of:
-	0: Disable completely.
-	1: Enable for all filetypes (default)
-	A whitelist: Enable for only the filetypes in this list.
-	A blackdict: Enable unless the filetype is in the dict with a 0 value.
+	0		Disable completely.
+	1		Enable for all filetypes
+	A whitelist	Enable for only the filetypes in this list.
+	A blackdict	Enable dict[filetype] is 0
+Default: 1
 
 					*g:viewport_forbidden_files*
 A list of regexes. Files which match the regex will not have views created.
-The file will be fully expanded before the regex is used. Default: >
-	['^/dev/null$', '^/tmp']
-<
+The file will be fully expanded before the regex is used.
+Default: ['^/dev/null$', '^/tmp']
+
 					*g:viewport_forbidden_settings*
 A list of settings which, if set, signal that views should not be made.
-Default: >
-	['diff']
-<
+Default: ['diff']
 
 					*g:viewport_forbidden_vars*
 A list of variable names (given as strings), which, if existing and set,
-signal that views should not be made. Default: >
-	['b:viewport_disable']
-<
-This allows you to set 'b:viewport_disable' in a file to locally disable
-viewport.
+signal that views should not be made.
+Default: ['b:viewport_disable']
 
 					*g:viewport_automap*
-Whether to make the default keybindings. See |viewport-mappings|.
+Enables the default mappings when non-empty. See |viewport-mappings|.
+If set to a letter, all mappings will be bound under <leader><letter>.
+If set to 1, all mappings will be bound under <leader>v.
+Default: 0
 
 =============================================================================
 COMMANDS					*viewport-commands*
 
 :ViewportClear[!] [settings]			*:ViewportClear*
-	Clears views.
+	Clears a view file.
 
-	If used without [!] or [settings], it removes the view for the current
-	file.  If used with [!] and without [settings], it removes all view
-	files.  If used without [!] and with [settings], each setting in
-	[settings] is removed from the view file. The full name of the setting
-	must be given, i.e. 'tabstop' instead of 'ts'.  If used with [!] and
-	with [settings], each setting in [settings] is removed from all view
-	files. This is very useful if you change your workflow and want to
-	remove settings from all view files, e.g. > :ViewportClear! autochdir
-	< will clear the 'autochdir' from all views, letting them default to
-	the global setting.
+	If [settings] is given it's used as a list of settings to clear from
+	the file instead of clearing the whole file entirely. Use the long
+	names of settings.
 
+	[!] makes the command apply to all views instead of just the current
+	file view.
+
+	Examples:
+>
+	" Clear 'tabstop', 'shiftwidth', and 'expandtab' from all views
+	:ViewportClear! tabstop shiftwidth expandtab
+	" Remove this file's view
+	:ViewportClear
+<
 	:ViewportClear only clears default (unnumbered) views. It assumes that
 	if you've made numbered views that those are for special purpose and
 	does not remove them.
-
-	TODO: Detect numbers in [settings] and remove numbered views.
 
 =============================================================================
 STATUSLINE                                      *viewport-statusline*
@@ -102,13 +97,14 @@ viewport#statusline([{level}])			*viewport#statusline*
 	INFO:
 	'[no view]' if the file has no view.
 
-	We suggest something like the following in your statusline: >
+	We suggest something like the following in your statusline:
+>
 		set statusline+=%#ModeMsg#
 		set statusline+=%{viewport#statusline(g:hume#0#MESSAGE)}
 		set statusline+=%#WarningMsg#
 		set statusline+=%{viewport#statusline(g:hume#0#INFO)}
 		set statusline+=%*
-	<
+<
 	You are encouraged to customize this to your own needs. See
 	|viewport#views()| for help with customization.
 
@@ -116,20 +112,22 @@ viewport#statusline([{level}])			*viewport#statusline*
 MAPPINGS					*viewport-mappings*
 
 Viewport does not set any mappings by default. We suggest something like the
-following to your vimrc: >
-	" Delete this file's view
-	noremap <leader>vx :ViewportClear
-	" Delete all file's views
-	noremap <leader>vd :ViewportClear!
-	" Unset a setting globally.
-	noremap <leader>vu :ViewportClear! ¬
-	" Unset a setting in Only this view
-	noremap <leader>vo :ViewportClear ¬
+following to your vimrc:
+>
+	noremap <leader>vd :ViewportClear!	" Delete all views
+	noremap <leader>ve :ViewportClear ¬	" Erase setting for file
+	noremap <leader>vu :ViewportClear! ¬	" Erase setting for all
+	noremap <leader>vx :ViewportClear	" Delete view for file
 <
-Notice the '¬' marker. That should not be in your mappings, but rather shows
-that you should have trailing whitespace in the line.
+NOTE: the '¬' marker should not be included, it is there to show you trailing
+whitespace. In those commands you're supposed to type a setting which will be
+cleared, e.g.
+>
+	\vetabstop<CR>
+<
+Do not include comments in your own mappings.
 
-Notice also that none of these mappings end with <CR>. This helps prevent the
+Notice that none of these mappings end with <CR>. This helps prevent the
 accidental deletion of view files, as you'll have to type the key binding and
 then press enter. If you don't want this safeguard, add <CR> to the end of the
 first two mappings.
