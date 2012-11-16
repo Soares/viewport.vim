@@ -10,6 +10,7 @@ CONTENTS					*viewport-contents*
 	    2. Configuration.............................|viewport-config|
 	    3. Commands..................................|viewport-commands|
 	    4. Status line...............................|viewport-statusline|
+	    4. Functions.................................|viewport-functions|
 	    5. Mappings..................................|viewport-mappings|
 	    6. Extras....................................|viewport-extras|
 	    7. About.....................................|viewport-about|
@@ -82,31 +83,41 @@ COMMANDS					*viewport-commands*
 =============================================================================
 STATUSLINE                                      *viewport-statusline*
 
-viewport#statusline([{level}])			*viewport#statusline*
-	Creates a statusline flag.
-
-	Takes an optional {level} function, which should be one of the |hume|
-	statusbar levels (ALL, MESSAGE, INFO, WARNING, ERROR). Displays
-	a statusline flag depending upon the mode.
-
-	MESSAGE:
-	'[view]' if the file has the default view.
-	'[view X]' where X is the views available, numbered 1-9 with
-		'*' meaning the default view.
-
-	INFO:
-	'[no view]' if the file has no view.
-
-	We suggest something like the following in your statusline:
+Viewport provides flags to customize your statusline. Flags are separated into
+'info' (which we recommend showing green) and 'message' (which we recommend
+showing yellow). You could set up your statusline as follows:
 >
-		set statusline+=%#ModeMsg#
-		set statusline+=%{viewport#statusline(g:hume#0#MESSAGE)}
-		set statusline+=%#WarningMsg#
-		set statusline+=%{viewport#statusline(g:hume#0#INFO)}
-		set statusline+=%*
+	set statusline+=%#ModeMsg#
+	set statusline+=%{viewport#status#info()}
+	set statusline+=%#WarningMsg#
+	set statusline+=%{viewport#status#message()}
+	set statusline+=%*
 <
-	You are encouraged to customize this to your own needs. See
-	|viewport#views()| for help with customization.
+You are encouraged to customize this to your own needs. See |viewport#views()|
+for help with customization.
+
+viewport#status#flag()				*viewport#status#flag()*
+	This convenience function is a combination of both
+	|viewport#status#message()| and |viewport#status#info()| in case you
+	don't want them separately colored.
+
+viewport#status#info()				*viewport#status#info()*
+	''		if there is no view file
+	'[view]'	if the file has the default view.
+	'[view X]'	where X is the views available, numbered 1-9 with
+			'*' meaning the default view.
+
+viewport#status#message()			*viewport#status#message()*
+	'[no view]'	if there is no view file
+
+=============================================================================
+FUNCTIONS					*viewport-functions*
+
+viewport#views()				*viewport#views()*
+	This function returns the numbers of all view files that exist for the
+	current file, with '0' meaning the default view and 1-9 for the rest.
+
+	It's useful if you want to roll your own vim status line.
 
 =============================================================================
 MAPPINGS					*viewport-mappings*
@@ -136,16 +147,7 @@ If you like these mappings, set 'g:viewport_autoload'. You're encouraged to
 customize these to your needs.
 
 =============================================================================
-EXTRAS                                          *viewport-extras*
-
-						*viewport#views()*
-This function returns the numbers of all view files that exist for the current
-file, with '0' meaning the default view and 1-9 meaning views 1-9.
-
-It's useful if you want to roll your own vim status lien.
-
-=============================================================================
-ABOUT                                           *viewport-about*
+ABOUT						*viewport-about*
 
 Fair warning: Viewport is a bit hackish. It depends upon perl and upon vim's
 viewfile format, subject to change at any time. Your mileage may vary.
