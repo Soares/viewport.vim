@@ -59,8 +59,12 @@ Default: 0
 =============================================================================
 COMMANDS					*viewport-commands*
 
-:ViewportClear[!] [settings]			*:ViewportClear*
+:ViewportClear[!] [views] [settings]		*:ViewportClear*
 	Clears a view file.
+
+	[views] may be a list of numbers. If given, the command affects those
+	view numbers. '0' specifies the default view files. If omitted,
+	[views] defaults to '0'.
 
 	If [settings] is given it's used as a list of settings to clear from
 	the file instead of clearing the whole file entirely. Use the long
@@ -73,8 +77,8 @@ COMMANDS					*viewport-commands*
 >
 	" Clear 'tabstop', 'shiftwidth', and 'expandtab' from all views
 	:ViewportClear! tabstop shiftwidth expandtab
-	" Remove this file's view
-	:ViewportClear
+	" Remove this file's 2nd, 4th, and 6th view
+	:ViewportClear 246
 <
 	:ViewportClear only clears default (unnumbered) views. It assumes that
 	if you've made numbered views that those are for special purpose and

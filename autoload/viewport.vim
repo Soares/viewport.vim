@@ -32,7 +32,7 @@ endfunction
 " Finds the views for a file.
 " @param {list} numbers The numbers of view files to find, each 0-9.
 "		If empty, search for all numbers.
-"@param {string?} path The path to search for, defaults to this file's base
+" @param {string?} path The path to search for, defaults to this file's base
 "		viewfile. Globs allowed.
 " @return {list} The view files
 function! viewport#files(numbers, ...)
@@ -127,10 +127,14 @@ function! viewport#shouldmake()
 		return 0
 	endif
 	for l:setting in g:viewport_forbidden_settings
-		exe 'if &'.l:setting.' | return 0 | endif'
+		if eval('&' . l:setting)
+			return 0
+		endif
 	endfor
 	for l:var in g:viewport_forbidden_vars
-		exe 'if exists("'.l:var.'") && '.l:var.' | return 0 | endif'
+		if exists(l:var) && eval(l:var)
+			return 0
+		endif
 	endfor
 	if !s:check(g:viewport_filetypes)
 		return 0
