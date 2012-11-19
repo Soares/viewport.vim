@@ -9,12 +9,8 @@ endfunction
 
 function! viewport#status#alert()
 	let l:views = viewport#views()
-	if l:views == '0'
-		return '[view]'
-	elseif l:views =~# '\v^0'
-		return '[view *'.l:views[1:].']'
-	else
-		return '[view '.l:views.']'
+	if empty(l:views)
+		return '[no view]'
 	endif
 	return ''
 endfunction
@@ -22,8 +18,12 @@ endfunction
 
 function! viewport#status#info()
 	let l:views = viewport#views()
-	if empty(l:views)
-		return '[no view]'
+	if l:views == '0'
+		return '[view]'
+	elseif l:views =~# '0'
+		return '[view *'.substitute(l:views[1:],'0','','').']'
+	elseif !empty(l:views)
+		return '[view '.l:views.']'
 	endif
 	return ''
 endfunction
